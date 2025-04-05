@@ -6,6 +6,9 @@ from bson import ObjectId
 from pymongo.errors import PyMongoError
 from typing import Dict, Any, Optional
 
+import sys
+sys.path.append('../')
+
 load_dotenv()
 mongo_uri = os.environ.get('MONGO_URI')
 
