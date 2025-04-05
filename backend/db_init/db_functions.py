@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 from bson import ObjectId
 from pymongo.errors import PyMongoError
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Union
 
 import sys
 sys.path.append('../')
@@ -15,6 +15,7 @@ mongo_uri = os.environ.get('MONGO_URI')
 client = MongoClient(mongo_uri)
 db = client["NWHDB"]
 collection = db["UserLogin"]
+profile_collection = db['ProfileCollection']
 
 def validate_db_connection() -> bool:
     """
@@ -49,7 +50,30 @@ def create_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     except PyMongoError as e:
         print(f"❌ Error inserting user: {e}")
         return None
- 
+
+
+def create_profile(name: str, geo_location: Dict[str, Union[float, Any]], acres: Union[float, int]) -> Optional[Dict[str, Any]]:
+    """
+    Inserts a document into ProfileCollection with name, geo_location, and acres.
+    """
+    if not name or not geo_location or acres is None:
+        print("❗ Name, geo_location, and acres are required.")
+        return None
+
+    try:
+        profile_doc = {
+            "name": name,
+            "geo_location": geo_location,  
+            "acres": acres,
+        }
+        result = profile_collection.insert_one(profile_doc)
+        print(f"✅ Profile created with ID: {result.inserted_id}")
+        return {"_id": str(result.inserted_id)}
+    except PyMongoError as e:
+        print(f"❌ Error inserting profile: {e}")
+        return None
+
+
 if __name__ == "__main__":
     if validate_db_connection():
-        create_user("Nishchal123", "WOWOWOW")
+        create_profile('Harshith', 340, 202220)
