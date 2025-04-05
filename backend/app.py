@@ -4,6 +4,7 @@ import os
 from dotenv import load_dotenv
 from datetime import datetime
 import call_functions
+import db_functions
 
 load_dotenv()
 
@@ -48,13 +49,30 @@ def soil_details():
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     
     
-app.route('/login', methods = ['POST'])
+@app.route('/login', methods = ['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
     
+    id = db_functions.validate_login(username, password)
+    if id:
+        return jsonify({'id': id.get('_id')}), 200
+    else:
+        return jsonify({"error": "Login credentials don't match"}), 500
 
+    
+@app.route('/signup', methods = ['POST'])
+def signup():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    id = db_functions.create_user(username, password)
+    if id:
+        return jsonify({'id': id.get('_id')}), 200
+    else:
+        return jsonify({"error": "creating user"}), 500
 
 # @app.route('/get-data', methods=['GET'])
 # def get_data():
