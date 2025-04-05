@@ -69,8 +69,7 @@ def validate_login(username: str, password: str) -> Optional[Dict[str, Any]]:
             print(f"❌ Error validating login: {e}")
             return None
 
- 
- 
+
 if __name__ == "__main__":
     create_user("test", "WOWOWOW")
     print(validate_login("test", "WOWOWOW"))

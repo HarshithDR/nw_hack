@@ -9,6 +9,35 @@ import db_functions
 load_dotenv()
 
 app = Flask(__name__)
+    
+@app.route('/login', methods = ['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
+    id = db_functions.validate_login(username, password)
+    if id:
+        return jsonify({'id': id.get('_id')}), 200
+    else:
+        return jsonify({"error": "Login credentials don't match"}), 500
+
+    
+@app.route('/signup', methods = ['POST'])
+def signup():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    land_area = data.get('land_area')
+    land_location = data.get('land_location')
+    
+    id = db_functions.create_user(username, password)
+    if id:
+        db_functions.add_profile(id.get('_id'), land_area, land_location)
+        return jsonify({'id': id.get('_id')}), 200
+    else:
+        return jsonify({"error": "creating user"}), 500
+
 
 @app.route('/soil_details', methods=['POST'])
 def soil_details():
@@ -48,40 +77,7 @@ def soil_details():
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     
-    
-@app.route('/login', methods = ['POST'])
-def login():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    
-    id = db_functions.validate_login(username, password)
-    if id:
-        return jsonify({'id': id.get('_id')}), 200
-    else:
-        return jsonify({"error": "Login credentials don't match"}), 500
 
-    
-@app.route('/signup', methods = ['POST'])
-def signup():
-    data = request.get_json()
-    username = data.get('username')
-    password = data.get('password')
-    
-    id = db_functions.create_user(username, password)
-    if id:
-        return jsonify({'id': id.get('_id')}), 200
-    else:
-        return jsonify({"error": "creating user"}), 500
-
-# @app.route('/get-data', methods=['GET'])
-# def get_data():
-#     return jsonify({"message": "This is a GET request"})
-
-# @app.route('/post-data', methods=['POST'])
-# def post_data():
-#     data = request.get_json()
-#     return jsonify({"received": data}), 201
 
 if __name__ == '__main__':
     app.run(debug=True)
