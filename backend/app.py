@@ -9,11 +9,12 @@ load_dotenv()
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = 'uploaded_images'  # Directory to save uploaded images
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 @app.route('/soil_details', methods=['POST'])
 def soil_details():
+    """json accepts: 
+    raspberrypi : Yes or No
+    image: ....."""
+    
     try:
         data = request.get_json()
         raspberry_pi = data.get('raspberrypi')
@@ -45,6 +46,14 @@ def soil_details():
 
     except Exception as e:
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
+    
+    
+app.route('/login', methods = ['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    
 
 
 # @app.route('/get-data', methods=['GET'])

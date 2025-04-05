@@ -3,3 +3,6 @@ def raspi_take_image():
     
 def soil_test():
     print('soil analysis fucntion')
+    
+def validate_login():
+    print('checking login details')
