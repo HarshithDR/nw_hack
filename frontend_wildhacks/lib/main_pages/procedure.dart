@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend_wildhacks/main_pages/initial_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
 
@@ -109,15 +110,24 @@ class _ProcedurePageState extends State<ProcedurePage> {
                 ),
                 BulletPoint(text: "6. Harvest time: When grains turn golden"),
                 SizedBox(height: 30),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => InitialPage()),
-                //     );
-                //   },
-                //   child: Text("I am satisfied and ready"),
-                // ),
+                Align(
+                  alignment: Alignment.center,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color.fromRGBO(209, 226, 196, 0.664),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => InitialPage()),
+                      );
+                    },
+                    child: Text(
+                      "I am satisfied and ready",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
