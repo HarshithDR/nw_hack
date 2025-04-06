@@ -499,12 +499,14 @@ class _MainPager1State extends State<MainPager1> {
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/soil');
+                      Navigator.pushNamed(context, '/alerts'); //for timebeing
                     },
                     child: Text("Next"),
                   ),
                 ),
+
                 SizedBox(height: 20),
+
                 TextButton.icon(
                   onPressed: () => showSavedDevicesDialog(context),
                   icon: Icon(Icons.list, color: Colors.white70),

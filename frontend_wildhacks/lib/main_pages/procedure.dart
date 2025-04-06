@@ -11,9 +11,10 @@ class _ProcedurePageState extends State<ProcedurePage> {
   late VideoPlayerController _controller;
   final List<String> videoPaths = ["assets/images/video_1.mp4"];
   int _currentVideoIndex = 0;
+
+  @override
   void initState() {
     super.initState();
-
     _initializeVideo();
   }
 
@@ -63,59 +64,95 @@ class _ProcedurePageState extends State<ProcedurePage> {
         ),
         backgroundColor: Color.fromRGBO(85, 84, 36, 1),
       ),
-      body: Stack(
-        children: [
-          Opacity(
-            opacity: 0.4,
-            child: Hero(
-              tag: 'videotag',
-              child:
-                  _controller.value.isInitialized
-                      ? SizedBox.expand(
-                        child: FittedBox(
-                          fit: BoxFit.cover,
-                          child: SizedBox(
-                            width: _controller.value.size.width,
-                            height: _controller.value.size.height,
-                            child: VideoPlayer(_controller),
+      body: Center(
+        child: Stack(
+          children: [
+            Opacity(
+              opacity: 0.4,
+              child: Hero(
+                tag: 'videotag',
+                child:
+                    _controller.value.isInitialized
+                        ? SizedBox.expand(
+                          child: FittedBox(
+                            fit: BoxFit.cover,
+                            child: SizedBox(
+                              width: _controller.value.size.width,
+                              height: _controller.value.size.height,
+                              child: VideoPlayer(_controller),
+                            ),
                           ),
+                        )
+                        : Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.85),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 2,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Steps to grow $crop:",
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
-                      )
-                      : Center(child: CircularProgressIndicator()),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Steps to grow $crop:",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 20),
+                      BulletPoint(
+                        text: "1. Ideal growing period: 120-150 days",
+                      ),
+                      BulletPoint(
+                        text: "2. Water requirement: Moderate to High",
+                      ),
+                      BulletPoint(text: "3. Yield: 3-5 tons per hectare"),
+                      BulletPoint(text: "4. Soil type: Loamy and well-drained"),
+                      BulletPoint(
+                        text: "5. Fertilization: Apply nitrogen and phosphorus",
+                      ),
+                      BulletPoint(
+                        text: "6. Harvest time: When grains turn golden",
+                      ),
+                      SizedBox(height: 20),
+                      Center(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text("Go Back"),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 20),
-                BulletPoint(text: "1. Ideal growing period: 120-150 days"),
-                BulletPoint(text: "2. Water requirement: Moderate to High"),
-                BulletPoint(text: "3. Yield: 3-5 tons per hectare"),
-                BulletPoint(text: "4. Soil type: Loamy and well-drained"),
-                BulletPoint(
-                  text: "5. Fertilization: Apply nitrogen and phosphorus",
-                ),
-                BulletPoint(text: "6. Harvest time: When grains turn golden"),
-                SizedBox(height: 30),
-                // ElevatedButton(
-                //   onPressed: () {
-                //     Navigator.push(
-                //       context,
-                //       MaterialPageRoute(builder: (context) => InitialPage()),
-                //     );
-                //   },
-                //   child: Text("I am satisfied and ready"),
-                // ),
-              ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -130,27 +167,17 @@ class BulletPoint extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.brightness_1, size: 8),
-                SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    text,
-                    style: GoogleFonts.aboreto(
-                      color: Colors.white70,
-                      fontSize: MediaQuery.of(context).size.height / 20,
-                    ),
-                  ),
-                ),
-              ],
+      child: Row(
+        children: [
+          Icon(Icons.brightness_1, size: 8, color: Colors.black),
+          SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.aboreto(color: Colors.black, fontSize: 18),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

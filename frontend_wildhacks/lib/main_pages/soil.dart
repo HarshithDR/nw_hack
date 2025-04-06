@@ -279,36 +279,62 @@ class _SoilPageState extends State<SoilPage> {
     }
   }
 
-  void _showCropSelection() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Select Crop"),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              for (String crop in ['Wheat', 'Rice', 'Corn', 'Soybean'])
-                ListTile(
-                  title: Text(crop),
-                  onTap: () {
-                    setState(() {
-                      selectedCrop = crop;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("Cancel"),
-            ),
-          ],
+  void _showCropSelection() async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'http://your-backend-url.com/getCrops',
+        ), // Update with your actual endpoint
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Parse the JSON response to get the crop list
+        List<String> crops = List<String>.from(
+          jsonDecode(response.body)['crops'],
         );
-      },
-    );
+
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("Select Crop"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (String crop in crops)
+                    ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          selectedCrop = crop;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                      child: Text(crop),
+                    ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancel"),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to fetch crops: ${response.statusCode}'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error fetching crops: $e')));
+    }
   }
 
   @override

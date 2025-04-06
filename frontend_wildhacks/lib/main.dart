@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:frontend_wildhacks/Home/landingpage1.dart';
+import 'package:frontend_wildhacks/main_pages/alerts.dart';
 import 'package:frontend_wildhacks/main_pages/main_pager1.dart';
 import 'package:frontend_wildhacks/main_pages/procedure.dart';
 import 'package:frontend_wildhacks/main_pages/soil.dart';
 import 'package:frontend_wildhacks/pageviewer/pageviewer.dart';
+import 'package:frontend_wildhacks/main_pages/croproad.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +24,8 @@ class MyAgri extends StatelessWidget {
         '/home': (context) => MainPager1(),
         '/soil': (context) => SoilPage(),
         '/procedure': (context) => ProcedurePage(),
+        '/croproad': (context) => CropRoadPage(),
+        '/alerts': (context) => AlertPage(),
       },
     );
   }
