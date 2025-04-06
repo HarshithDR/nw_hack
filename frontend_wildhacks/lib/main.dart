@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend_wildhacks/Home/home.dart';
+import 'package:frontend_wildhacks/pageviewer/pageviewer.dart';
 
 void main() => runApp(MyAgri());
 
@@ -8,7 +8,7 @@ class MyAgri extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AgriHome(),
+      home: PageViewer(),
       theme: ThemeData(useMaterial3: true),
     );
   }
