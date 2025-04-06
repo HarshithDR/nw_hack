@@ -36,7 +36,7 @@ def signup():
     
     id = db_functions.create_user(username, password)
     if id:
-        db_functions.add_profile(id.get('_id'), land_location, land_area)
+        db_functions.create_profile(id.get('_id'), land_location, land_area)
         return jsonify({'id': id.get('_id')}), 200
     else:
         return jsonify({"error": "creating user"}), 500

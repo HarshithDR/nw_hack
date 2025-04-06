@@ -112,12 +112,12 @@ def get_image(filename):
         return None
 
 
-def create_or_update_user_collection(user_id: str, desc: str, response: str) -> Optional[Dict[str, Any]]:
+def create_or_update_user_collection(user_id: str, descreption: str, response: str) -> Optional[Dict[str, Any]]:
     """
     Creates or updates a collection for the user based on user_id.
     If the collection already exists, it will append new documents.
     """
-    if not user_id or not desc or not response:
+    if not user_id or not descreption or not response:
         print("❗ User ID, description, and response are required.")
         return None
     
@@ -127,7 +127,7 @@ def create_or_update_user_collection(user_id: str, desc: str, response: str) -> 
         user_collection = db[user_collection_name]
         
         new_doc = {
-            "desc": desc,
+            "desc": descreption,
             "response": response,
             "timestamp": datetime.now()  
         }
