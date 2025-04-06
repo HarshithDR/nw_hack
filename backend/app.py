@@ -10,6 +10,7 @@ from flask import send_file
 from db_functions import db_functions
 
 load_dotenv()
+trigger_photo = False
 
 app = Flask(__name__)
     
@@ -95,6 +96,13 @@ def select_crop():
     except Exception as e:
         return jsonify({"error":e}), 500
     
+@app.route('/check_if_photo_needed', methods = ['GET'])
+def check_if_photo_needed():
+    if trigger_photo:
+        return jsonify({'take_photo':True}), 200
+    
+    return jsonify({None}), 500
+
 # @app.route('/get_image/<filename>', methods=['GET'])
 # def get_image(filename):
 #     file_data = db_functions.get_image(filename)
