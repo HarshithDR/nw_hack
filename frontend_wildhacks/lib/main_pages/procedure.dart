@@ -55,13 +55,14 @@ class _ProcedurePageState extends State<ProcedurePage> {
     final crop = ModalRoute.of(context)?.settings.arguments as String?;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text(
           "Procedure for $crop",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Color.fromRGBO(85, 84, 36, 1),
+        backgroundColor: Color.fromRGBO(85, 84, 36, 0.774),
       ),
       body: Stack(
         children: [
@@ -89,9 +90,14 @@ class _ProcedurePageState extends State<ProcedurePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                SizedBox(height: MediaQuery.of(context).size.height / 10),
                 Text(
                   "Steps to grow $crop:",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white70,
+                  ),
                 ),
                 SizedBox(height: 20),
                 BulletPoint(text: "1. Ideal growing period: 120-150 days"),
