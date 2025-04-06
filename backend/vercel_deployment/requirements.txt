@@ -3,3 +3,8 @@ pymongo==4.3.3
 python-dotenv==1.0.0
 pytz==2023.3
 flask-cors==3.0.10
+google-generativeai
+Pillow==10.3.0
+openmeteo_requests
+requests_cache
+pandas
