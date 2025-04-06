@@ -32,6 +32,7 @@ numpy==2.2.4
 openmeteo_requests==1.4.0
 openmeteo_sdk==1.19.0
 pandas==2.2.3
+gunicorn
 pillow==11.1.0
 platformdirs==4.3.7
 proto-plus==1.26.1
