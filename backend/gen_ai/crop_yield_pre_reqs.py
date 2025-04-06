@@ -26,29 +26,29 @@ dummy_user_history = [
     }
 ]
 
-def fetch_acres_and_history(user_id: str) -> Optional[tuple]:
-    """
-    Fetch acres and history from dummy JSON data.
-    """
-    try:
-        if dummy_profile_data["id"] != user_id:
-            print(f"No profile found for user ID: {user_id}")
-            return None
+# def fetch_acres_and_history(user_id: str) -> Optional[tuple]:
+#     """
+#     Fetch acres and history from dummy JSON data.
+#     """
+#     try:
+#         if dummy_profile_data["id"] != user_id:
+#             print(f"No profile found for user ID: {user_id}")
+#             return None
 
-        acres = float(dummy_profile_data.get("acres", 0))
-        history = [{"desc": doc.get("desc", ""), "response": doc.get("response", "")} for doc in dummy_user_history]
+#         acres = float(dummy_profile_data.get("acres", 0))
+#         history = [{"desc": doc.get("desc", ""), "response": doc.get("response", "")} for doc in dummy_user_history]
 
-        return acres, history
+#         return acres, history
 
-    except Exception as e:
-        print(f"Error fetching user data: {e}")
-        return None
+#     except Exception as e:
+#         print(f"Error fetching user data: {e}")
+#         return None
 
-def prompt_gemini_for_crop(crop_name: str, acres: float, history: list) -> str:
+def prompt_gemini_for_crop(crop_name: str, acres: float) -> str:
     """
     Prompt Gemini 1.5 Flash to get a JSON response with crop details.
     """
-    history_text = "\n".join([f"Q: {h['desc']}\nA: {h['response']}" for h in history]) if history else "No prior interaction history."
+    # history_text = "\n".join([f"Q: {h['desc']}\nA: {h['response']}" for h in history]) if history else "No prior interaction history."
 
     prompt = f"""
 You're an expert agricultural consultant.
@@ -58,7 +58,6 @@ Given:
 - Land size: {acres} acres
 - Previous user conversations: 
 
-{history_text}
 
 Provide the following information as a JSON object with keys "Time to Harvest", "Cost", and "Yield". Each value should be a string with units (e.g., "5 months", "$2000", "10 tonnes"). Do not include any explanations, additional text, or markdown formatting. Only output the plain JSON object without any formatting.
 
@@ -87,17 +86,16 @@ def get_crop_recommendation_for_user(crop_name: str, user_id: str) -> str:
     acres, history = result
     return prompt_gemini_for_crop(crop_name, acres, history)
 
-def get_crop_roadmap(crop_name: str, pre_info: dict) -> dict:
+def get_crop_roadmap(crop_name: str) -> dict:
     """
     Prompt Gemini to get a roadmap from seeding to harvest based on cost, time, and yield.
     The output is a JSON with textual keys and values, in chronological order.
     """
-    pre_info_json = json.dumps(pre_info)
+    # pre_info_json = json.dumps(pre_info)
     prompt = f"""
 You're an expert agricultural advisor.
 
 Given the following details for the crop "{crop_name}":
-{pre_info_json}
 
 Provide a step-by-step roadmap to grow this crop from seeding to harvest. Return the answer in a JSON format where:
 - The keys are short sentences describing each step in chronological order.

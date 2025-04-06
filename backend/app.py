@@ -10,7 +10,7 @@ from gen_ai import weather_data_fetch
 import time
 # import db_functions
 import json
-from gen_ai import lat_long_finder
+from gen_ai import lat_long_finder, crop_yield_pre_reqs
 from db_functions import db_functions
 
 load_dotenv()
@@ -111,10 +111,25 @@ def select_crop():
         return jsonify({"error":e}), 500
     
     
+@app.route('/crop_yield', methods = ['POST'])
+def crop_yield():
+    data = request.get_json()
+    id = data.get('id')
+    acres = db_functions.retrieve_acres(id)
+    crop = db_functions.retrieve_crop(id)
+    preds = json.loads(crop_yield_pre_reqs.prompt_gemini_for_crop(crop, acres))
+    return jsonify({"preds": preds}), 200
 
+
+@app.route('/roadmap', methods = ['POST'])
+def roadmap():
+    data = request.get_json()
+    id = data.get('id')
     
+    crop = db_functions.retrieve_crop(id)
+    roadmap_data = crop_yield_pre_reqs(crop)
     
-    
+    return jsonify({"data": roadmap_data}), data
     
     
     
