@@ -7,7 +7,7 @@ import call_functions
 from io import BytesIO
 from flask import send_file
 # import db_functions
-from db_init import db_functions
+from db_functions import db_functions
 
 load_dotenv()
 
@@ -84,13 +84,13 @@ def soil_details():
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     
     
-@app.route('/get_image/<filename>', methods=['GET'])
-def get_image(filename):
-    file_data = db_functions.get_image(filename)
-    if file_data:
-        return send_file(BytesIO(file_data), download_name=filename, as_attachment=True)
-    else:
-        return jsonify({"error": "File not found"}), 404
+# @app.route('/get_image/<filename>', methods=['GET'])
+# def get_image(filename):
+#     file_data = db_functions.get_image(filename)
+#     if file_data:
+#         return send_file(BytesIO(file_data), download_name=filename, as_attachment=True)
+#     else:
+#         return jsonify({"error": "File not found"}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
