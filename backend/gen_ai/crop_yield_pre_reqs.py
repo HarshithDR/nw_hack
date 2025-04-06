@@ -87,8 +87,42 @@ def get_crop_recommendation_for_user(crop_name: str, user_id: str) -> str:
     acres, history = result
     return prompt_gemini_for_crop(crop_name, acres, history)
 
+def get_crop_roadmap(crop_name: str, pre_info: dict) -> dict:
+    """
+    Prompt Gemini to get a roadmap from seeding to harvest based on cost, time, and yield.
+    The output is a JSON with textual keys and values, in chronological order.
+    """
+    pre_info_json = json.dumps(pre_info)
+    prompt = f"""
+You're an expert agricultural advisor.
+
+Given the following details for the crop "{crop_name}":
+{pre_info_json}
+
+Provide a step-by-step roadmap to grow this crop from seeding to harvest. Return the answer in a JSON format where:
+- The keys are short sentences describing each step in chronological order.
+- The values explain what should be done in that step (concise and clear).
+- The entire content should be only plain text. No formatting, no special characters, no bullet points.
+
+Only return a valid JSON. Do not include any extra text before or after the JSON.
+"""
+
+    try:
+        response = model.generate_content(prompt)
+        return json.loads(response.text)
+    except Exception as e:
+        return {"error": f"Failed to get response: {e}"}
+
+
+
 if __name__ == "__main__":
     user_id = "67f209150029416ba26b1443"
     crop = "Wheat"
     output = get_crop_recommendation_for_user(crop, user_id)
     print(output)
+    
+    roadmap = get_crop_roadmap(crop, output)
+    print("🌾 Roadmap from Seeding to Harvest:\n")
+    print(json.dumps(roadmap, indent=2))
+
+    
