@@ -6,9 +6,12 @@ import 'dart:html' as html;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:frontend_wildhacks/globals.dart';
 import 'package:frontend_wildhacks/splashscreens/splashscreen.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
+import '../globals.dart';
+
 import 'package:http/http.dart' as http;
 
 class SoilPage extends StatefulWidget {
@@ -199,20 +202,16 @@ class _SoilPageState extends State<SoilPage> {
     }
   }
 
-  Future<void> sendToBackend(String raspberryPi, Uint8List? imageBytes) async {
+  Future<void> sendToBackend(
+    String currentUserId,
+    Uint8List? imageBytes,
+  ) async {
     if (imageBytes == null) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text("Please select an image first")));
       return;
     }
-
-    // if (raspberryPi.isEmpty) {
-    //   ScaffoldMessenger.of(
-    //     context,
-    //   ).showSnackBar(SnackBar(content: Text("Please enter Raspberry Pi ID")));
-    //   return;
-    // }
 
     setState(() {
       isLoading = true;
@@ -221,8 +220,9 @@ class _SoilPageState extends State<SoilPage> {
     try {
       String base64Image = base64Encode(imageBytes);
       Map<String, dynamic> data = {
-        'raspberryPi': raspberryPi,
         'image': base64Image,
+        'raspberrypi': 'Yes',
+        'id': currentUserId,
       };
       final response = await http.post(
         Uri.parse('http://your-backend-url.com/upload'),
@@ -251,25 +251,32 @@ class _SoilPageState extends State<SoilPage> {
     }
   }
 
-  void _enterRaspberryPiId() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Enter Raspberry Pi ID"),
-          content: TextField(
-            onChanged: (value) => raspberryPiId = value,
-            decoration: InputDecoration(hintText: "Raspberry Pi ID"),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text("OK"),
-            ),
-          ],
+  void _enterRaspberryPiId(String currentUserId) async {
+    try {
+      Map<String, dynamic> data = {'raspberrypi': 'Yes', 'id': currentUserId};
+      final response = await http.post(
+        Uri.parse('http://your-backend-url.com/upload'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Raspberry Pi data sent successfully')),
         );
-      },
-    );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Failed to send Raspberry Pi data: ${response.statusCode}',
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error sending Raspberry Pi data: $e')),
+      );
+    }
   }
 
   void _showCropSelection() {
@@ -365,8 +372,28 @@ class _SoilPageState extends State<SoilPage> {
                               _buildActionButton(
                                 "Raspberry Pi",
                                 Icons.devices,
-                                _enterRaspberryPiId,
+                                () {
+                                  if (currentUserId != null &&
+                                      currentUserId!.isNotEmpty) {
+                                    _enterRaspberryPiId(currentUserId!);
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          "User ID is not available",
+                                        ),
+                                        backgroundColor: const Color.fromARGB(
+                                          174,
+                                          105,
+                                          240,
+                                          175,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
                               ),
+
                               SizedBox(height: 15),
                               _buildActionButton(
                                 "Camera",
@@ -430,7 +457,11 @@ class _SoilPageState extends State<SoilPage> {
                           _imageBytes == null
                               ? null
                               : () {
-                                sendToBackend(raspberryPiId, _imageBytes);
+                                sendToBackend(
+                                  currentUserId ?? 'Unknown',
+                                  _imageBytes,
+                                );
+
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     backgroundColor: const Color.fromARGB(
