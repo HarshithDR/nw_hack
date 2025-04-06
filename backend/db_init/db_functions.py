@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from datetime import datetime
 from bson import ObjectId
+import gridfs
 from pymongo.errors import PyMongoError
 from typing import Dict, Any, Optional, Union
 
@@ -14,7 +15,8 @@ mongo_uri = os.environ.get('MONGO_URI')
 
 client = MongoClient(mongo_uri)
 db = client["NWHDB"]
-collection = db["UserLogin"]
+login_collection = db["UserLogin"]
+fs = gridfs.GridFS(db)
 profile_collection = db['ProfileCollection']
 
 def validate_db_connection() -> bool:
@@ -30,6 +32,27 @@ def validate_db_connection() -> bool:
         print(f"❌ Failed to connect to MongoDB: {e}")
         return False
 
+def validate_login(username: str, password: str) -> Optional[Dict[str, Any]]:
+    """
+    Validates user login by checking if the provided username and password match a record in the database.
+    Returns the user's unique ID if successful, otherwise returns None.
+    """
+    if validate_db_connection():
+        if not username or not password:
+            print("❗ Username and password cannot be empty.")
+            return None
+        try:
+            user = login_collection.find_one({"username": username, "password": password})
+            if user:
+                print(f"✅ Login successful for user: {username}")
+                return {"_id": str(user["_id"]), "username": user["username"]}
+            else:
+                print("❌ Invalid username or password.")
+                return None
+        except PyMongoError as e:
+            print(f"❌ Error validating login: {e}")
+            return None
+
 def create_user(username: str, password: str) -> Optional[Dict[str, Any]]:
     """
     Inserts a document with username and password into the UserLogin collection.
@@ -44,7 +67,7 @@ def create_user(username: str, password: str) -> Optional[Dict[str, Any]]:
             "username": username,
             "password": password,
         }
-        result = collection.insert_one(user_doc)
+        result = login_collection.insert_one(user_doc)
         print(f"✅ User created with ID: {result.inserted_id}")
         return {"_id": str(result.inserted_id)}
     except PyMongoError as e:
@@ -73,6 +96,23 @@ def create_profile(id: str, geo_location: Dict[str, Union[float, Any]], acres: U
         print(f"❌ Error inserting profile: {e}")
         return None
 
+def upload_image(file_data, filename):
+    try:
+        file_id = fs.put(file_data, filename=filename)
+        return file_id
+    except Exception as e:
+        print(f"Error uploading image: {e}")
+        return None
+
+def get_image(filename):
+    try:
+        file = fs.find_one({"filename": filename})
+        if file:
+            return file.read()
+        return None
+    except Exception as e:
+        print(f"Error retrieving image: {e}")
+        return None
 
 if __name__ == "__main__":
     if validate_db_connection():
