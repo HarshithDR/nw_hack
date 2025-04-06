@@ -52,17 +52,17 @@ def create_user(username: str, password: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def create_profile(name: str, geo_location: Dict[str, Union[float, Any]], acres: Union[float, int]) -> Optional[Dict[str, Any]]:
+def create_profile(id: str, geo_location: Dict[str, Union[float, Any]], acres: Union[float, int]) -> Optional[Dict[str, Any]]:
     """
     Inserts a document into ProfileCollection with name, geo_location, and acres.
     """
-    if not name or not geo_location or acres is None:
+    if not id or not geo_location or acres is None:
         print("❗ Name, geo_location, and acres are required.")
         return None
 
     try:
         profile_doc = {
-            "name": name,
+            "id": id,
             "geo_location": geo_location,  
             "acres": acres,
         }
