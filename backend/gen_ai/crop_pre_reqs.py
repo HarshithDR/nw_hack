@@ -6,13 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Dummy environment variable (replace with real API key)
-
-# Gemini setup
 genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
 model = genai.GenerativeModel("gemini-1.5-flash")
-
-# ---------- Dummy JSON Data ----------
 
 dummy_profile_data = {
     "id": "67f209150029416ba26b1443",
@@ -31,32 +26,27 @@ dummy_user_history = [
     }
 ]
 
-
-
 def fetch_acres_and_history(user_id: str) -> Optional[tuple]:
     """
     Fetch acres and history from dummy JSON data.
     """
     try:
         if dummy_profile_data["id"] != user_id:
-            print(f"❌ No profile found for user ID: {user_id}")
+            print(f"No profile found for user ID: {user_id}")
             return None
 
-        # Convert string "acres" to float
         acres = float(dummy_profile_data.get("acres", 0))
-
-        # Extract only needed fields from dummy history
         history = [{"desc": doc.get("desc", ""), "response": doc.get("response", "")} for doc in dummy_user_history]
 
         return acres, history
 
     except Exception as e:
-        print(f"❌ Error fetching user data: {e}")
+        print(f"Error fetching user data: {e}")
         return None
 
 def prompt_gemini_for_crop(crop_name: str, acres: float, history: list) -> str:
     """
-    Prompt Gemini 1.5 Flash with crop name, land size, and user history.
+    Prompt Gemini 1.5 Flash to get a JSON response with crop details.
     """
     history_text = "\n".join([f"Q: {h['desc']}\nA: {h['response']}" for h in history]) if history else "No prior interaction history."
 
@@ -70,35 +60,35 @@ Given:
 
 {history_text}
 
-Please provide:
-1. Estimated time from planting to harvest.
-2. Estimated cost to grow {crop_name} on {acres} acres.
-3. Expected yield (in kg or tons depending on crop).
+Provide the following information as a JSON object with keys "Time to Harvest", "Cost", and "Yield". Each value should be a string with units (e.g., "5 months", "$2000", "10 tonnes"). Do not include any explanations, additional text, or markdown formatting. Only output the plain JSON object without any formatting.
 
-Make the answer clear, concise, and helpful for a beginner farmer.
+Example:
+{{
+  "Time to Harvest": "5 months",
+  "Cost": "$2000",
+  "Yield": "10 tonnes"
+}}
 """
 
     try:
         response = model.generate_content(prompt)
-        return response.text
+        return response.text.strip()
     except Exception as e:
-        return f"❌ Error generating Gemini response: {e}"
+        return json.dumps({"error": f"Error generating Gemini response: {e}"})
 
 def get_crop_recommendation_for_user(crop_name: str, user_id: str) -> str:
     """
-    Main function to fetch data and return Gemini's crop recommendation.
+    Main function to fetch data and return Gemini's crop recommendation as JSON.
     """
     result = fetch_acres_and_history(user_id)
     if not result:
-        return "❌ Could not fetch user data."
+        return json.dumps({"error": "Could not fetch user data."})
 
     acres, history = result
     return prompt_gemini_for_crop(crop_name, acres, history)
 
-# ---------- Example Run ----------
 if __name__ == "__main__":
     user_id = "67f209150029416ba26b1443"
     crop = "Wheat"
     output = get_crop_recommendation_for_user(crop, user_id)
-    print("🌾 Crop Recommendation Report:\n")
     print(output)
