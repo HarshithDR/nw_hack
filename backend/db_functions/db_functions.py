@@ -4,7 +4,10 @@ from dotenv import load_dotenv
 from datetime import datetime
 from bson import ObjectId
 import gridfs
+from PIL import Image
+import io
 from pymongo.errors import PyMongoError
+import base64
 from typing import Dict, Any, Optional, Union
 
 load_dotenv()
@@ -26,7 +29,7 @@ def validate_db_connection() -> bool:
         print("✅ MongoDB connection is valid.")
         return True
     except PyMongoError as e:
-        print(f"❌ Failed to connect to MongoDB: {e}")
+        print(f"Failed to connect to MongoDB: {e}")
         return False
 
 def validate_login(username: str, password: str) -> Optional[Dict[str, Any]]:
@@ -36,18 +39,18 @@ def validate_login(username: str, password: str) -> Optional[Dict[str, Any]]:
     """
     if validate_db_connection():
         if not username or not password:
-            print("❗ Username and password cannot be empty.")
+            print("Username and password cannot be empty.")
             return None
         try:
             user = login_collection.find_one({"username": username, "password": password})
             if user:
-                print(f"✅ Login successful for user: {username}")
+                print(f"Login successful for user: {username}")
                 return {"_id": str(user["_id"]), "username": user["username"]}
             else:
-                print("❌ Invalid username or password.")
+                print("Invalid username or password.")
                 return None
         except PyMongoError as e:
-            print(f"❌ Error validating login: {e}")
+            print(f"Error validating login: {e}")
             return None
 
 def create_user(username: str, password: str) -> Optional[Dict[str, Any]]:
@@ -105,7 +108,9 @@ def get_image(filename):
     try:
         file = fs.find_one({"filename": filename})
         if file:
-            return file.read()
+            file_bytes = file.read()
+            image = Image.open(io.BytesIO(file_bytes))
+            return image
         return None
     except Exception as e:
         print(f"Error retrieving image: {e}")
@@ -146,7 +151,29 @@ def update_crop_selection_to_user_profile(user_id: str, crop: str) -> Optional[D
         print(f"❌ Error updating crop selection: {e}")
         return None
     
-    
+# def retrieve_address(user_id: str) -> Optional[Dict[str, Any]]:
+#     """
+#     Retrieves the address (geo_location) from ProfileCollection using the user_id.
+#     Returns the address details if found, otherwise returns None.
+#     """
+#     if not user_id:
+#         print("❗ User ID is required.")
+#         return None
+
+#     try:
+#         # Retrieve the profile document using the user_id
+#         profile = profile_collection.find_one({"id": user_id})
+
+#         if not profile:
+#             print("❌ No profile found for the given user ID.")
+#             return None
+
+#         print(f"✅ Address retrieved for user ID: {user_id}")
+#         return profile.get("geo_location")  # Return only the geo_location field
+
+    except PyMongoError as e:
+        print(f"❌ Error retrieving address: {e}")
+        return None   
 
 def create_or_update_user_collection(user_id: str, descreption: str, response: str) -> Optional[Dict[str, Any]]:
     """
@@ -177,10 +204,10 @@ def create_or_update_user_collection(user_id: str, descreption: str, response: s
         print(f"❌ Error inserting/updating collection for user {user_id}: {e}")
         return None
 
-
 if __name__ == "__main__":
     if validate_db_connection():
-        create_profile('Rohan', 340, 202220)
+        # x = create_profile('Harshith', 340, 202220)
         
-        create_or_update_user_collection('Rohan', "Rohan's first desc", "Rohan's first response")
-        create_or_update_user_collection('Rohan', "Rohan's second desc", "Rohan's second response")
+        # create_or_update_user_collection(x.get("_id"), "Rohan's first desc", "Rohan's first response")
+        # create_or_update_user_collection(x.get("_id"), "Rohan's second desc", "Rohan's second response")
+        print(retrieve_address("67f24f705a4e05f3bf038593"))

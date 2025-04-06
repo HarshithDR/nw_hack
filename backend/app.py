@@ -6,6 +6,7 @@ from datetime import datetime
 import call_functions
 from io import BytesIO
 from flask import send_file
+import time
 # import db_functions
 from db_functions import db_functions
 
@@ -26,7 +27,6 @@ def login():
     else:
         return jsonify({"error": "Login credentials don't match"}), 500
 
-    
 @app.route('/signup', methods = ['POST'])
 def signup():
     data = request.get_json()
@@ -52,10 +52,14 @@ def soil_details():
     try:
         data = request.get_json()
         raspberry_pi = data.get('raspberrypi')
+        id = data.get('id')
         
         if raspberry_pi == 'Yes':
-            call_functions.raspi_take_image()
-            call_functions.soil_test()
+            global trigger_photo
+            trigger_photo = True
+            time.sleep(1)
+            file_id = "temp_soil_img.jpg"
+            call_functions.soil_test_and_crop_recommendation(id, file_id)
             return jsonify({'message': "Requested for Raspberry Pi to take photo and analyze"}), 200
             
         else:
@@ -76,7 +80,7 @@ def soil_details():
             file_id = db_functions.upload_image(image_bytes, filename)
             
             if file_id:
-                call_functions.soil_test()
+                call_functions.soil_test_and_crop_recommendation(id, file_id)
                 return jsonify({'message': 'Image received and saved to GridFS successfully', 'filename': filename, 'file_id': str(file_id)}), 200
             else:
                 return jsonify({'error': 'Failed to upload image to GridFS'}), 500
@@ -98,11 +102,35 @@ def select_crop():
     
 @app.route('/check_if_photo_needed', methods = ['GET'])
 def check_if_photo_needed():
+    print('rapberry pi requested')
     if trigger_photo:
         return jsonify({'take_photo':True}), 200
-    
-    return jsonify({None}), 500
+    return jsonify({"error": "trigger not detected"}), 500
 
+@app.route('/upload_image_from_raspi_for_soil_testing', methods = ['POST'])
+def upload_image_from_raspi_for_soil_testing():
+    data = request.get_json()
+    # image = data.get('image')
+    base64_image = data.get('image')
+        
+    if not base64_image:
+        return jsonify({'error': 'Image data is missing'}), 400
+    try:
+        # Decode the base64 string
+        image_bytes = base64.b64decode(base64_image)
+    except Exception as e:
+        return jsonify({'error': f'Invalid Base64 image data: {str(e)}'}), 400
+
+    filename = "temp_soil_img.jpg"  # You can customize the filename if needed
+    
+    # Upload the image to GridFS
+    file_id = db_functions.upload_image(image_bytes, filename)
+    
+    if file_id:
+        call_functions.soil_test_and_crop_recommendation(id, file_id)
+        return jsonify({'message': 'Image received and saved to GridFS successfully', 'filename': filename, 'file_id': str(file_id)}), 200
+    else:
+        return jsonify({'error': 'Failed to upload image to GridFS'}), 500
 # @app.route('/get_image/<filename>', methods=['GET'])
 # def get_image(filename):
 #     file_data = db_functions.get_image(filename)
@@ -111,5 +139,8 @@ def check_if_photo_needed():
 #     else:
 #         return jsonify({"error": "File not found"}), 404
 
+
+
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port = 5000, debug=True) 

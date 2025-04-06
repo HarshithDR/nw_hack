@@ -88,7 +88,6 @@ def process_image(image_path:str, prompt:str):
     result = {
         "result": response.text
     }
-    
     return json.dumps(result)
 
 
@@ -101,7 +100,6 @@ def recommend_crops(weather_data, image_path):
                       f"and precipitation is {weather_data['precipitation'].mean()} mm."
 
     prompt = f"Given the weather conditions ({weather_summary}), just gave the name of the crops as a JSON string that would be suitable to grow in this environment?. I do not want any explanation of the same"
-
     return process_image(image_path, prompt)
 
 
@@ -111,10 +109,10 @@ def main(image_path, latitude, longitude):
     
     return recommended_crops
 
+if __name__ == '__main__':
+    image_path = 'red_soil.jpg' 
+    latitude = 52.52
+    longitude = 13.41
 
-image_path = 'red_soil.jpg' 
-latitude = 52.52
-longitude = 13.41
-
-recommended_crops = main(image_path, latitude, longitude)
-print(f"Recommended crops to grow: {recommended_crops}")
+    recommended_crops = main(image_path, latitude, longitude)
+    print(f"Recommended crops to grow: {recommended_crops}")
