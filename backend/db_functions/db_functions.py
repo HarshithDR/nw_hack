@@ -7,9 +7,6 @@ import gridfs
 from pymongo.errors import PyMongoError
 from typing import Dict, Any, Optional, Union
 
-import sys
-sys.path.append('../')
-
 load_dotenv()
 mongo_uri = os.environ.get('MONGO_URI')
 
