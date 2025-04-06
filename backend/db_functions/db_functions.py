@@ -151,25 +151,25 @@ def update_crop_selection_to_user_profile(user_id: str, crop: str) -> Optional[D
         print(f"❌ Error updating crop selection: {e}")
         return None
     
-# def retrieve_address(user_id: str) -> Optional[Dict[str, Any]]:
-#     """
-#     Retrieves the address (geo_location) from ProfileCollection using the user_id.
-#     Returns the address details if found, otherwise returns None.
-#     """
-#     if not user_id:
-#         print("❗ User ID is required.")
-#         return None
+def retrieve_address(user_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieves the address (geo_location) from ProfileCollection using the user_id.
+    Returns the address details if found, otherwise returns None.
+    """
+    if not user_id:
+        print("❗ User ID is required.")
+        return None
 
-#     try:
-#         # Retrieve the profile document using the user_id
-#         profile = profile_collection.find_one({"id": user_id})
+    try:
+        # Retrieve the profile document using the user_id
+        profile = profile_collection.find_one({"id": user_id})
 
-#         if not profile:
-#             print("❌ No profile found for the given user ID.")
-#             return None
+        if not profile:
+            print("❌ No profile found for the given user ID.")
+            return None
 
-#         print(f"✅ Address retrieved for user ID: {user_id}")
-#         return profile.get("geo_location")  # Return only the geo_location field
+        print(f"✅ Address retrieved for user ID: {user_id}")
+        return profile.get("geo_location")  # Return only the geo_location field
 
     except PyMongoError as e:
         print(f"❌ Error retrieving address: {e}")
