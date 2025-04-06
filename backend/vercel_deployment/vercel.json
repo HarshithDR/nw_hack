@@ -8,6 +8,7 @@
           "includeFiles": [
             "db_functions/**",
             "call_functions/**",
+            "gen_ai/**",
             ".env"
           ]
         }
