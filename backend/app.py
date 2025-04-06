@@ -84,6 +84,17 @@ def soil_details():
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     
     
+@app.route('/select_crop', methods = ['POST'])
+def select_crop():
+    data = request.get_json()
+    id = data.get('id')
+    crop = data.get('selected_crop')
+    try:
+        db_functions.update_crop_selection_to_user_profile(id, crop)
+        return jsonify({"message":"updated profile section with crop"}), 200
+    except Exception as e:
+        return jsonify({"error":e}), 500
+    
 # @app.route('/get_image/<filename>', methods=['GET'])
 # def get_image(filename):
 #     file_data = db_functions.get_image(filename)

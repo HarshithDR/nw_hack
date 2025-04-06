@@ -110,7 +110,43 @@ def get_image(filename):
     except Exception as e:
         print(f"Error retrieving image: {e}")
         return None
+    
+def update_crop_selection_to_user_profile(user_id: str, crop: str) -> Optional[Dict[str, Any]]:
+    """
+    Retrieves the MongoDB _id from ProfileCollection using user_id and updates the profile with the selected crop.
+    """
+    if not user_id or not crop:
+        print("❗ User ID and crop selection are required.")
+        return None
 
+    try:
+        # Retrieve the MongoDB _id using the user_id
+        profile = profile_collection.find_one({"id": user_id})
+
+        if not profile:
+            print("❌ No profile found for the given user ID.")
+            return None
+
+        profile_id = profile["_id"]  # Extracting MongoDB ObjectId
+
+        # Update the profile with the crop selection
+        result = profile_collection.update_one(
+            {"_id": profile_id},  # Update using MongoDB ObjectId
+            {"$set": {"crop": crop}}
+        )
+
+        if result.modified_count == 0:
+            print("⚠ No changes were made. The crop might already be set.")
+        else:
+            print(f"✅ Crop selection updated for user ID: {user_id}")
+
+        return {"user_id": user_id, "crop": crop}
+
+    except PyMongoError as e:
+        print(f"❌ Error updating crop selection: {e}")
+        return None
+    
+    
 
 def create_or_update_user_collection(user_id: str, descreption: str, response: str) -> Optional[Dict[str, Any]]:
     """
