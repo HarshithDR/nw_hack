@@ -10,6 +10,7 @@ from flask import send_file
 from db_functions import db_functions
 
 load_dotenv()
+trigger_photo = False
 
 app = Flask(__name__)
     
@@ -36,7 +37,7 @@ def signup():
     
     id = db_functions.create_user(username, password)
     if id:
-        db_functions.add_profile(id.get('_id'), land_location, land_area)
+        db_functions.create_profile(id.get('_id'), land_location, land_area)
         return jsonify({'id': id.get('_id')}), 200
     else:
         return jsonify({"error": "creating user"}), 500
@@ -84,6 +85,24 @@ def soil_details():
         return jsonify({'error': f'An error occurred: {str(e)}'}), 500
     
     
+@app.route('/select_crop', methods = ['POST'])
+def select_crop():
+    data = request.get_json()
+    id = data.get('id')
+    crop = data.get('selected_crop')
+    try:
+        db_functions.update_crop_selection_to_user_profile(id, crop)
+        return jsonify({"message":"updated profile section with crop"}), 200
+    except Exception as e:
+        return jsonify({"error":e}), 500
+    
+@app.route('/check_if_photo_needed', methods = ['GET'])
+def check_if_photo_needed():
+    if trigger_photo:
+        return jsonify({'take_photo':True}), 200
+    
+    return jsonify({None}), 500
+
 # @app.route('/get_image/<filename>', methods=['GET'])
 # def get_image(filename):
 #     file_data = db_functions.get_image(filename)
