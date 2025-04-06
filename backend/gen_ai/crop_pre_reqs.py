@@ -6,13 +6,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Dummy environment variable (replace with real API key)
-
-# Gemini setup
 genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
 model = genai.GenerativeModel("gemini-1.5-flash")
-
-# ---------- Dummy JSON Data ----------
 
 dummy_profile_data = {
     "id": "67f209150029416ba26b1443",
@@ -31,27 +26,22 @@ dummy_user_history = [
     }
 ]
 
-
-
 def fetch_acres_and_history(user_id: str) -> Optional[tuple]:
     """
     Fetch acres and history from dummy JSON data.
     """
     try:
         if dummy_profile_data["id"] != user_id:
-            print(f"❌ No profile found for user ID: {user_id}")
+            print(f"No profile found for user ID: {user_id}")
             return None
 
-        # Convert string "acres" to float
         acres = float(dummy_profile_data.get("acres", 0))
-
-        # Extract only needed fields from dummy history
         history = [{"desc": doc.get("desc", ""), "response": doc.get("response", "")} for doc in dummy_user_history]
 
         return acres, history
 
     except Exception as e:
-        print(f"❌ Error fetching user data: {e}")
+        print(f"Error fetching user data: {e}")
         return None
 
 def prompt_gemini_for_crop(crop_name: str, acres: float, history: list) -> str:
@@ -82,7 +72,7 @@ Make the answer clear, concise, and helpful for a beginner farmer.
         response = model.generate_content(prompt)
         return response.text
     except Exception as e:
-        return f"❌ Error generating Gemini response: {e}"
+        return f"Error generating Gemini response: {e}"
 
 def get_crop_recommendation_for_user(crop_name: str, user_id: str) -> str:
     """
@@ -90,12 +80,11 @@ def get_crop_recommendation_for_user(crop_name: str, user_id: str) -> str:
     """
     result = fetch_acres_and_history(user_id)
     if not result:
-        return "❌ Could not fetch user data."
+        return "Could not fetch user data."
 
     acres, history = result
     return prompt_gemini_for_crop(crop_name, acres, history)
 
-# ---------- Example Run ----------
 if __name__ == "__main__":
     user_id = "67f209150029416ba26b1443"
     crop = "Wheat"
